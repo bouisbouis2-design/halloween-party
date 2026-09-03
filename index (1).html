@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Resto Halloween — Commande</title>
+<link href="https://fonts.googleapis.com/css2?family=Creepster&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+
+body{
+  font-family:'Crimson Text',serif;
+  background:#f5ead0 url('back.jpg') repeat;
+  min-height:100vh;
+}
+
+.main{
+  background:rgba(245,234,208,0.93);
+  min-height:100vh;
+  padding:0 0 30px;
+}
+
+.header-img{width:100%;display:block;max-height:180px;object-fit:cover;object-position:center top;}
+
+.main-body{padding:12px 12px 0;}
+
+.section{background:rgba(255,255,240,0.75);border:1px solid #cc550033;border-radius:8px;padding:10px;margin-bottom:8px;position:relative;z-index:1;}
+.options-label{font-size:0.68rem;color:#6b4400;letter-spacing:2px;text-transform:uppercase;margin-bottom:5px;font-family:'Crimson Text',serif;font-weight:600;}
+.nom-input{width:100%;padding:8px 10px;border:1.5px solid #cc550055;border-radius:6px;background:#fff8e8;font-family:'Crimson Text',serif;font-size:1rem;color:#3d1a00;outline:none;margin-top:4px;}
+.nom-input:focus{border-color:#cc5500;}
+.nom-input::placeholder{color:#c4a06a;font-style:italic;}
+.sec-divider{height:1px;background:linear-gradient(90deg,transparent,#cc550055,transparent);margin:8px 0;}
+
+.art-section{margin-bottom:8px;position:relative;z-index:1;}
+.art-section-header{display:flex;align-items:center;justify-content:space-between;border-radius:8px;overflow:hidden;user-select:none;}
+.art-illus{width:70px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.2);min-height:70px;}
+.art-illus img{width:66px;height:64px;object-fit:contain;}
+.art-illus-placeholder{width:54px;height:50px;border:1.5px dashed rgba(255,255,255,0.4);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:0.5rem;color:rgba(255,255,255,0.5);text-align:center;letter-spacing:1px;}
+.art-info{flex:1;padding:10px 10px;}
+.art-name{font-family:'Creepster',cursive;font-size:0.92rem;letter-spacing:1px;color:#fff;}
+.art-tag{font-size:0.6rem;opacity:0.75;font-style:italic;color:#fff;margin-top:1px;}
+.art-price{font-family:'Creepster',cursive;font-size:0.88rem;color:#fff;opacity:0.85;margin-top:2px;}
+.art-add-zone{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 12px;gap:4px;cursor:pointer;background:rgba(0,0,0,0.15);min-width:64px;}
+.art-add-zone:active{background:rgba(0,0,0,0.3);}
+.art-counter{font-family:'Creepster',cursive;font-size:1.3rem;color:#fff;line-height:1;}
+.art-counter.zero{opacity:0.4;}
+.art-add-label{font-family:'Creepster',cursive;font-size:0.62rem;color:#fff;letter-spacing:1px;opacity:0.8;}
+.art-plus{width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,0.25);border:1.5px solid rgba(255,255,255,0.5);display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:#fff;font-weight:bold;}
+.ash-purple{background:#4a0080;}.ash-orange{background:#cc5500;}.ash-orange2{background:#996600;}.ash-green{background:#2d5a00;}
+
+.items-list{}
+.item-entry{background:#fffdf0;border:1.5px solid #cc550033;border-top:none;padding:10px 12px;}
+.item-entry:last-child{border-radius:0 0 8px 8px;}
+.item-entry-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.item-num{font-family:'Creepster',cursive;font-size:0.82rem;letter-spacing:1px;}
+.item-num.purple{color:#4a0080;}.item-num.orange{color:#cc5500;}.item-num.brown{color:#996600;}.item-num.green{color:#2d5a00;}
+.del-btn{background:#fff0f0;border:1px solid #e74c3c;color:#e74c3c;border-radius:5px;padding:3px 8px;font-size:0.7rem;cursor:pointer;}
+.del-btn:active{background:#e74c3c;color:#fff;}
+.opts-grid{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px;}
+.opt-item{display:flex;align-items:center;gap:5px;padding:5px 8px;border:1px solid #cc550044;border-radius:6px;background:#fff8e8;cursor:pointer;user-select:none;font-size:0.78rem;color:#3d1a00;transition:all 0.12s;}
+.opt-item.sel-orange{background:#cc5500;color:#fff;border-color:#aa3300;}
+.opt-item.sel-purple{background:#4a0080;color:#fff;border-color:#2d0050;}
+.opt-item.sel-green{background:#2d5a00;color:#fff;border-color:#1a3300;}
+.opt-item.sel-brown{background:#996600;color:#fff;border-color:#664400;}
+.opt-chk{width:12px;height:12px;border:1.5px solid #cc5500;border-radius:3px;background:#fff;flex-shrink:0;}
+.radio-row{display:flex;gap:6px;margin-top:4px;}
+.radio-item{flex:1;padding:7px;border:1.5px solid #cc550044;border-radius:6px;background:#fff8e8;cursor:pointer;text-align:center;font-size:0.82rem;color:#3d1a00;transition:all 0.15s;}
+.radio-item.sel-green{background:#2d5a00;color:#fff;border-color:#1a3300;}
+
+.panier{background:#1a0800;border-radius:8px;padding:10px 12px;margin-bottom:8px;position:relative;z-index:1;display:none;}
+.panier-title{font-family:'Creepster',cursive;font-size:0.85rem;color:#ff8c00;letter-spacing:2px;margin-bottom:6px;}
+.panier-line{display:flex;justify-content:space-between;font-size:0.78rem;color:#f5ead0;padding:2px 0;border-bottom:1px solid #ffffff11;}
+.panier-total-row{display:flex;justify-content:space-between;font-family:'Creepster',cursive;font-size:1rem;color:#ff8c00;margin-top:6px;}
+
+.validate-btn{width:100%;padding:11px;background:linear-gradient(135deg,#cc5500,#ff8c00);color:#1a0800;border:none;border-radius:8px;font-family:'Creepster',cursive;font-size:1rem;letter-spacing:2px;cursor:pointer;position:relative;z-index:1;text-transform:uppercase;}
+.validate-btn:active{transform:scale(0.98);}
+
+.sending-block{display:none;background:#1a0800;border:1.5px solid #ff8c0044;border-radius:8px;padding:14px;text-align:center;margin-bottom:8px;position:relative;z-index:1;}
+.sending-spinner{display:inline-block;width:24px;height:24px;border:3px solid #ff8c0033;border-top-color:#ff8c00;border-radius:50%;animation:spin 0.8s linear infinite;margin-bottom:6px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.sending-text{font-family:'Creepster',cursive;font-size:0.85rem;color:#ff8c00;letter-spacing:2px;}
+.sending-attempt{font-size:0.7rem;color:#ff8c0066;font-style:italic;margin-top:2px;}
+
+.err-block{display:none;background:#2a0000;border:2px solid #e74c3c;border-radius:8px;padding:14px;text-align:center;margin-bottom:8px;position:relative;z-index:1;}
+.err-title{font-family:'Creepster',cursive;font-size:0.9rem;color:#e74c3c;letter-spacing:1px;margin-bottom:4px;}
+.err-text{font-size:0.78rem;color:#ff8c0099;font-style:italic;margin-bottom:10px;line-height:1.5;}
+.retry-btn{background:#e74c3c;color:#fff;border:none;border-radius:6px;padding:8px 20px;font-family:'Creepster',cursive;font-size:0.85rem;letter-spacing:1px;cursor:pointer;}
+
+.err-simple{background:#fff0f0;border:1px solid #c0392b;border-radius:6px;color:#8B1A1A;font-size:0.8rem;padding:6px 10px;display:none;margin-bottom:8px;font-style:italic;position:relative;z-index:1;}
+
+/* SUCCÈS */
+.success{
+  display:none;min-height:100vh;
+  background:#1a0800;
+  flex-direction:column;align-items:center;justify-content:center;
+  padding:20px;text-align:center;position:relative;overflow:hidden;
+}
+.success::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse 80% 60% at 50% 30%,#3d0060 0%,transparent 70%);pointer-events:none;}
+.web-deco{position:absolute;opacity:0.15;pointer-events:none;}
+.suc-inner{position:relative;z-index:2;width:100%;max-width:380px;}
+.suc-check{font-family:'Creepster',cursive;font-size:1rem;color:#ff8c00;letter-spacing:4px;text-transform:uppercase;margin-bottom:6px;}
+.suc-title{font-family:'Creepster',cursive;font-size:1.4rem;color:#fff8e8;letter-spacing:2px;margin-bottom:16px;}
+.suc-identity{display:flex;gap:10px;margin-bottom:16px;}
+.suc-nom-block{flex:1;background:rgba(255,255,255,0.05);border:2px solid #9b30ff66;border-radius:16px;padding:14px 10px;}
+.suc-nom-label{font-family:'Creepster',cursive;font-size:0.65rem;color:#9b30ff99;letter-spacing:3px;text-transform:uppercase;margin-bottom:4px;}
+.suc-nom{font-family:'Creepster',cursive;font-size:1.5rem;color:#fff8e8;line-height:1.1;word-break:break-word;}
+.suc-num-block{flex:1;background:rgba(255,255,255,0.05);border:2px solid #ff8c0066;border-radius:16px;padding:14px 10px;position:relative;}
+.suc-num-block::before{content:'';position:absolute;top:-1px;left:20%;right:20%;height:2px;background:linear-gradient(90deg,transparent,#ff8c00,transparent);}
+.suc-num-label{font-family:'Creepster',cursive;font-size:0.65rem;color:#ff8c0099;letter-spacing:3px;text-transform:uppercase;margin-bottom:4px;}
+.suc-num{font-family:'Creepster',cursive;font-size:3rem;color:#ff8c00;line-height:1;text-shadow:0 0 30px #ff6b0088;}
+.suc-capture{background:rgba(255,140,0,0.1);border:1.5px solid #ff8c0044;border-radius:10px;padding:12px 14px;margin-bottom:14px;}
+.suc-capture-title{font-family:'Creepster',cursive;font-size:0.85rem;color:#ff8c00;letter-spacing:1px;margin-bottom:5px;}
+.suc-capture-text{font-size:0.8rem;color:#f5ead099;font-style:italic;line-height:1.6;}
+.suc-recap{background:rgba(255,255,240,0.06);border:1px solid #ffffff22;border-radius:10px;padding:10px 14px;text-align:left;}
+.suc-recap-title{font-family:'Creepster',cursive;font-size:0.72rem;color:#ff8c0088;letter-spacing:3px;text-transform:uppercase;margin-bottom:6px;border-bottom:1px solid #ffffff11;padding-bottom:4px;}
+.suc-recap-line{font-size:0.78rem;color:#f5ead0bb;padding:2px 0;line-height:1.5;}
+.suc-recap-total{font-family:'Creepster',cursive;font-size:0.95rem;color:#ff8c00;margin-top:6px;border-top:1px solid #ffffff11;padding-top:6px;display:flex;justify-content:space-between;}
+</style>
+</head>
+<body>
+
+<!-- FORMULAIRE -->
+<div id="form-page">
+  <div class="main">
+    <img class="header-img" src="header.png" alt="Resto Halloween"/>
+    <div class="main-body">
+
+      <div class="section">
+        <div class="options-label">Votre prenom</div>
+        <input class="nom-input" id="prenom" type="text" placeholder="Ecris ton prenom..." autocomplete="given-name" autocorrect="off" autocapitalize="words" inputmode="text" name="prenom-commande"/>
+      </div>
+
+      <div class="art-section">
+        <div class="art-section-header ash-purple" id="hdr-menu">
+          <div class="art-illus"><img src="menu.png" alt="Menu" onerror="this.parentNode.innerHTML='<div class=art-illus-placeholder>MENU</div>'"/></div>
+          <div class="art-info"><div class="art-name">Menu</div><div class="art-tag">Hot-Dog + Frites</div><div class="art-price">6,00 €</div></div>
+          <div class="art-add-zone" onclick="addItem('menu')"><div class="art-counter zero" id="counter-menu">0</div><div class="art-plus">+</div><div class="art-add-label">Ajouter</div></div>
+        </div>
+        <div class="items-list" id="list-menu"></div>
+      </div>
+
+      <div class="art-section">
+        <div class="art-section-header ash-orange" id="hdr-hotdog">
+          <div class="art-illus"><img src="hotdog.png" alt="Hot-Dog" onerror="this.parentNode.innerHTML='<div class=art-illus-placeholder>HOT-DOG</div>'"/></div>
+          <div class="art-info"><div class="art-name">Hot-Dog</div><div class="art-price">4,00 €</div></div>
+          <div class="art-add-zone" onclick="addItem('hotdog')"><div class="art-counter zero" id="counter-hotdog">0</div><div class="art-plus">+</div><div class="art-add-label">Ajouter</div></div>
+        </div>
+        <div class="items-list" id="list-hotdog"></div>
+      </div>
+
+      <div class="art-section">
+        <div class="art-section-header ash-orange2" id="hdr-frites">
+          <div class="art-illus"><img src="frites.png" alt="Frites" onerror="this.parentNode.innerHTML='<div class=art-illus-placeholder>FRITES</div>'"/></div>
+          <div class="art-info"><div class="art-name">Frites</div><div class="art-price">2,50 €</div></div>
+          <div class="art-add-zone" onclick="addItem('frites')"><div class="art-counter zero" id="counter-frites">0</div><div class="art-plus">+</div><div class="art-add-label">Ajouter</div></div>
+        </div>
+        <div class="items-list" id="list-frites"></div>
+      </div>
+
+      <div class="art-section">
+        <div class="art-section-header ash-green" id="hdr-crepe">
+          <div class="art-illus"><img src="crepe.png" alt="Crepe" onerror="this.parentNode.innerHTML='<div class=art-illus-placeholder>CREPE</div>'"/></div>
+          <div class="art-info"><div class="art-name">Crepe</div><div class="art-price">2,50 €</div></div>
+          <div class="art-add-zone" onclick="addItem('crepe')"><div class="art-counter zero" id="counter-crepe">0</div><div class="art-plus">+</div><div class="art-add-label">Ajouter</div></div>
+        </div>
+        <div class="items-list" id="list-crepe"></div>
+      </div>
+
+      <div class="panier" id="panier">
+        <div class="panier-title">Votre commande</div>
+        <div id="panier-lines"></div>
+        <div class="panier-total-row"><span>Total</span><span id="panier-total">0,00 €</span></div>
+      </div>
+
+      <div class="err-simple" id="err-simple"></div>
+      <div class="sending-block" id="sending-block">
+        <div class="sending-spinner"></div>
+        <div class="sending-text">Envoi en cours...</div>
+        <div class="sending-attempt" id="sending-attempt"></div>
+      </div>
+      <div class="err-block" id="err-block">
+        <div class="err-title">Commande non envoyee</div>
+        <div class="err-text">Votre connexion semble instable. Votre commande est bien remplie, appuyez sur Reessayer.</div>
+        <button class="retry-btn" onclick="reessayer()">Reessayer</button>
+      </div>
+      <button class="validate-btn" id="validate-btn" onclick="valider()">Envoyer ma commande</button>
+
+    </div>
+  </div>
+</div>
+
+<!-- SUCCÈS -->
+<div class="success" id="success-page">
+  <svg class="web-deco" style="top:-10px;left:-10px;width:140px;" viewBox="0 0 160 160" fill="none"><g stroke="#ff8c00" stroke-width="0.5"><line x1="160" y1="0" x2="0" y2="160"/><line x1="160" y1="0" x2="40" y2="160"/><line x1="160" y1="0" x2="80" y2="160"/><line x1="160" y1="0" x2="0" y2="80"/><circle cx="160" cy="0" r="40" stroke-dasharray="2,4"/><circle cx="160" cy="0" r="80" stroke-dasharray="2,4"/><circle cx="160" cy="0" r="120" stroke-dasharray="2,4"/></g></svg>
+  <svg class="web-deco" style="top:-10px;right:-10px;width:140px;transform:scaleX(-1);" viewBox="0 0 160 160" fill="none"><g stroke="#ff8c00" stroke-width="0.5"><line x1="160" y1="0" x2="0" y2="160"/><line x1="160" y1="0" x2="40" y2="160"/><line x1="160" y1="0" x2="80" y2="160"/><line x1="160" y1="0" x2="0" y2="80"/><circle cx="160" cy="0" r="40" stroke-dasharray="2,4"/><circle cx="160" cy="0" r="80" stroke-dasharray="2,4"/><circle cx="160" cy="0" r="120" stroke-dasharray="2,4"/></g></svg>
+  <div class="suc-inner">
+    <div class="suc-check">Commande confirmee</div>
+    <div class="suc-title">Votre identifiant</div>
+    <div class="suc-identity">
+      <div class="suc-nom-block"><div class="suc-nom-label">Prenom</div><div class="suc-nom" id="suc-nom">---</div></div>
+      <div class="suc-num-block"><div class="suc-num-label">N°</div><div class="suc-num" id="suc-num">---</div></div>
+    </div>
+    <div class="suc-capture">
+      <div class="suc-capture-title">Pensez a faire une capture d'ecran !</div>
+      <div class="suc-capture-text">Votre prenom et votre numero vous seront demandes lors de la remise de votre commande et du paiement. Gardez cet ecran ouvert ou photographiez-le.</div>
+    </div>
+    <div class="suc-recap">
+      <div class="suc-recap-title">Recapitulatif</div>
+      <div id="suc-lines"></div>
+      <div class="suc-recap-total"><span>Total a regler</span><span id="suc-total"></span></div>
+    </div>
+  </div>
+</div>
+
+<script>
+var SCRIPT_URL='https://script.google.com/macros/s/AKfycbxTXZ7CQYpu_mYPUUdxc0zfdDaoGGmVQl7B7BtXZrj8dGe3kSPUPZvbs_UItIduSfjc/exec';
+var PRIX={menu:6,hotdog:4,frites:2.5,crepe:2.5};
+var COLORS={menu:'purple',hotdog:'orange',frites:'brown',crepe:'green'};
+var NAMES={menu:'Menu',hotdog:'Hot-Dog',frites:'Frites',crepe:'Crepe'};
+var counters={menu:0,hotdog:0,frites:0,crepe:0};
+var uid=0,pendingPayload=null,pendingNum=null;
+
+function addItem(type){
+  counters[type]++;updateCounter(type);
+  var id='item-'+(++uid),color=COLORS[type],num=counters[type];
+  var inner='';
+  if(type==='menu'){inner='<div class="options-label">Accompagnements hotdog</div><div class="opts-grid"><div class="opt-item" onclick="togOpt(this,\'purple\')"><div class="opt-chk"></div>Cornichons</div><div class="opt-item" onclick="togOpt(this,\'purple\')"><div class="opt-chk"></div>Oignons frits</div></div><div class="sec-divider"></div><div class="options-label">Sauce (hotdog & frites)</div><div class="opts-grid"><div class="opt-item" onclick="togOpt(this,\'purple\')"><div class="opt-chk"></div>Mayo</div><div class="opt-item" onclick="togOpt(this,\'purple\')"><div class="opt-chk"></div>Ketchup</div><div class="opt-item" onclick="togOpt(this,\'purple\')"><div class="opt-chk"></div>Moutarde</div></div>';}
+  else if(type==='hotdog'){inner='<div class="options-label">Accompagnements</div><div class="opts-grid"><div class="opt-item" onclick="togOpt(this,\'orange\')"><div class="opt-chk"></div>Cornichons</div><div class="opt-item" onclick="togOpt(this,\'orange\')"><div class="opt-chk"></div>Oignons frits</div></div><div class="sec-divider"></div><div class="options-label">Sauce</div><div class="opts-grid"><div class="opt-item" onclick="togOpt(this,\'orange\')"><div class="opt-chk"></div>Mayo</div><div class="opt-item" onclick="togOpt(this,\'orange\')"><div class="opt-chk"></div>Ketchup</div><div class="opt-item" onclick="togOpt(this,\'orange\')"><div class="opt-chk"></div>Moutarde</div></div>';}
+  else if(type==='frites'){inner='<div class="options-label">Sauce</div><div class="opts-grid"><div class="opt-item" onclick="togOpt(this,\'brown\')"><div class="opt-chk"></div>Mayo</div><div class="opt-item" onclick="togOpt(this,\'brown\')"><div class="opt-chk"></div>Ketchup</div><div class="opt-item" onclick="togOpt(this,\'brown\')"><div class="opt-chk"></div>Moutarde</div></div>';}
+  else if(type==='crepe'){inner='<div class="options-label">Garniture</div><div class="radio-row" id="radio-'+id+'"><div class="radio-item" onclick="pickRadio(\'radio-'+id+'\',this)">Nutella</div><div class="radio-item" onclick="pickRadio(\'radio-'+id+'\',this)">Sucre</div></div>';}
+  var el=document.createElement('div');
+  el.className='item-entry';el.id=id;el.dataset.type=type;
+  el.innerHTML='<div class="item-entry-header"><div class="item-num '+color+'">'+NAMES[type]+' n°'+num+'</div><button class="del-btn" onclick="delItem(\''+id+'\',\''+type+'\')">Supprimer</button></div>'+inner;
+  document.getElementById('list-'+type).appendChild(el);
+  if(counters[type]===1)document.getElementById('hdr-'+type).style.borderRadius='8px 8px 0 0';
+  updatePanier();el.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function delItem(id,type){
+  document.getElementById(id).remove();
+  counters[type]=document.querySelectorAll('#list-'+type+' .item-entry').length;
+  renumberItems(type);updateCounter(type);
+  if(!counters[type])document.getElementById('hdr-'+type).style.borderRadius='8px';
+  updatePanier();
+}
+function renumberItems(type){document.querySelectorAll('#list-'+type+' .item-entry').forEach(function(el,i){el.querySelector('.item-num').textContent=NAMES[type]+' n°'+(i+1);});}
+function updateCounter(type){var el=document.getElementById('counter-'+type);el.textContent=counters[type];el.classList.toggle('zero',counters[type]===0);}
+function togOpt(el,type){var isOn=el.classList.contains('sel-'+type);el.classList.remove('sel-orange','sel-purple','sel-green','sel-brown');if(!isOn)el.classList.add('sel-'+type);}
+function pickRadio(gid,el){document.querySelectorAll('#'+gid+' .radio-item').forEach(function(r){r.classList.remove('sel-green');});el.classList.add('sel-green');}
+
+function updatePanier(){
+  var lines=[];var total=0;
+  ['menu','hotdog','frites','crepe'].forEach(function(type){document.querySelectorAll('#list-'+type+' .item-entry').forEach(function(el,i){lines.push({n:NAMES[type]+' n°'+(i+1),p:PRIX[type]});total+=PRIX[type];});});
+  var panier=document.getElementById('panier');
+  if(!lines.length){panier.style.display='none';return;}
+  panier.style.display='block';
+  document.getElementById('panier-lines').innerHTML=lines.map(function(l){return'<div class="panier-line"><span>'+l.n+'</span><span>'+l.p.toFixed(2)+' €</span></div>';}).join('');
+  document.getElementById('panier-total').textContent=total.toFixed(2)+' €';
+}
+
+function showErr(m){var e=document.getElementById('err-simple');e.textContent=m;e.style.display='block';e.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(function(){e.style.display='none';},4000);}
+
+function buildPayload(){
+  var p=document.getElementById('prenom').value.trim();
+  var lines=[];var total=0;
+  ['menu','hotdog','frites','crepe'].forEach(function(type){
+    document.querySelectorAll('#list-'+type+' .item-entry').forEach(function(el,i){
+      total+=PRIX[type];
+      var name=NAMES[type]+' n°'+(i+1);
+      if(type==='crepe'){var g=el.querySelector('.radio-item.sel-green');lines.push(name+' - '+(g?g.textContent:''));}
+      else{var opts=Array.from(el.querySelectorAll('[class*="sel-"]')).map(function(e){return e.textContent.trim();}).filter(Boolean);lines.push(name+(opts.length?' - '+opts.join(', '):''));}
+    });
+  });
+  return{prenom:p,numero:pendingNum,articles:lines.join(' | '),details:'',total:total.toFixed(2)};
+}
+
+function showSending(attempt,max){
+  document.getElementById('sending-block').style.display='block';
+  document.getElementById('err-block').style.display='none';
+  document.getElementById('validate-btn').style.display='none';
+  document.getElementById('sending-attempt').textContent=attempt>1?'Tentative '+attempt+' sur '+max+'...':'';
+}
+function showErrBlock(){
+  document.getElementById('sending-block').style.display='none';
+  document.getElementById('err-block').style.display='block';
+  document.getElementById('validate-btn').style.display='none';
+}
+
+async function sendWithRetry(payload,maxRetries){
+  maxRetries=maxRetries||3;
+  for(var i=1;i<=maxRetries;i++){
+    showSending(i,maxRetries);
+    try{
+      var params=new URLSearchParams(payload);
+      var resp=await fetch(SCRIPT_URL+'?'+params.toString());
+      var data=await resp.json();
+      if(data.status==='ok')return true;
+    }catch(e){if(i<maxRetries)await new Promise(function(r){setTimeout(r,1500);});}
+  }
+  return false;
+}
+
+async function valider(){
+  var p=document.getElementById('prenom').value.trim();
+  if(!p){showErr('Entre ton prenom pour continuer.');return;}
+  if(!document.querySelectorAll('.item-entry').length){showErr('Ajoute au moins un article !');return;}
+  var crepes=document.querySelectorAll('#list-crepe .item-entry');
+  for(var i=0;i<crepes.length;i++){if(!crepes[i].querySelector('.radio-item.sel-green')){showErr('Choisis une garniture pour chaque crepe.');return;}}
+  pendingNum=String(Math.floor(Math.random()*900)+100);
+  pendingPayload=buildPayload();
+  await envoyer();
+}
+async function reessayer(){await envoyer();}
+async function envoyer(){
+  var ok=await sendWithRetry(pendingPayload);
+  if(ok){afficherConfirmation();}else{showErrBlock();}
+}
+
+function afficherConfirmation(){
+  document.getElementById('suc-num').textContent=pendingNum;
+  document.getElementById('suc-nom').textContent=pendingPayload.prenom;
+  var lines=pendingPayload.articles.split(' | ');
+  document.getElementById('suc-lines').innerHTML=lines.map(function(l){return'<div class="suc-recap-line">'+l+'</div>';}).join('');
+  document.getElementById('suc-total').textContent=pendingPayload.total+' €';
+  document.getElementById('form-page').style.display='none';
+  document.getElementById('success-page').style.display='flex';
+}
+</script>
+</body>
+</html>
