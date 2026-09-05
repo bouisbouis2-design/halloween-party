@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Cuisine — Halloween Party</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#f0f0f0;font-family:'Segoe UI',Arial,sans-serif;min-height:100vh;font-size:14px;}
+
+/* PIN */
+.pin-screen{position:fixed;top:0;left:0;right:0;bottom:0;background:#1a1a1a;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:1000;}
+.pin-title{font-size:1.4rem;font-weight:700;color:#fff;letter-spacing:2px;margin-bottom:4px;}
+.pin-sub{font-size:0.8rem;color:#aaa;margin-bottom:24px;}
+.pin-dots{display:flex;gap:12px;margin-bottom:20px;}
+.pin-dot{width:16px;height:16px;border-radius:50%;border:2px solid #555;background:transparent;transition:all 0.2s;}
+.pin-dot.filled{background:#ff8c00;border-color:#ff8c00;}
+.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:200px;}
+.pin-btn{padding:16px;background:#2a2a2a;border:1px solid #333;border-radius:8px;font-size:1.3rem;font-weight:600;color:#fff;cursor:pointer;text-align:center;transition:all 0.15s;}
+.pin-btn:active{background:#ff8c00;color:#1a1a1a;}
+.pin-err{color:#e74c3c;font-size:0.78rem;margin-top:10px;min-height:18px;}
+
+/* HEADER */
+.header{background:#fff;border-bottom:1px solid #e0e0e0;padding:8px 12px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
+.header-left{display:flex;flex-direction:column;}
+.header-title{font-size:1rem;font-weight:700;color:#1a1a1a;}
+.header-sub{font-size:0.65rem;color:#999;margin-top:1px;}
+.header-right{display:flex;gap:6px;}
+.btn-refresh{background:#2980b9;border:none;color:#fff;border-radius:6px;padding:5px 10px;font-size:0.72rem;font-weight:700;cursor:pointer;}
+.btn-refresh:active{background:#1a6699;}
+.btn-lock{background:#f0f0f0;border:1px solid #ddd;color:#666;border-radius:6px;padding:5px 10px;font-size:0.72rem;cursor:pointer;}
+.btn-lock:active{background:#ddd;}
+
+/* COMPTEURS */
+.compteurs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:8px;background:#fff;border-bottom:1px solid #e0e0e0;}
+.cpt{text-align:center;border-radius:6px;padding:6px 4px;}
+.cpt-num{font-size:1.6rem;font-weight:700;line-height:1;}
+.cpt-label{font-size:0.58rem;letter-spacing:1px;text-transform:uppercase;margin-top:1px;color:#888;}
+.cpt.total .cpt-num{color:#333;}
+.cpt.att{background:#fff8f0;}.cpt.att .cpt-num{color:#e67e00;}
+.cpt.enc{background:#f0f7ff;}.cpt.enc .cpt-num{color:#2980b9;}
+.cpt.pre{background:#f0fff4;}.cpt.pre .cpt-num{color:#27ae60;}
+
+/* KDS GRILLE */
+.kds-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:8px;padding-bottom:40px;}
+@media(min-width:600px){.kds-grid{grid-template-columns:repeat(3,minmax(0,1fr));}}
+@media(min-width:900px){.kds-grid{grid-template-columns:repeat(4,minmax(0,1fr));}}
+
+/* TICKET */
+.ticket{background:#fff;border-radius:10px;border:0.5px solid #e0e0e0;border-left:4px solid #e67e00;overflow:hidden;display:grid;grid-template-rows:auto 1fr auto;transition:border-left-color 0.2s;}
+.ticket.enc{border-left-color:#2980b9;}
+.ticket.pre{border-left-color:#27ae60;opacity:0.6;}
+.ticket.urgent{border-left-color:#e74c3c;animation:pulse 1s infinite;}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 #e74c3c33;}50%{box-shadow:0 0 0 4px #e74c3c00;}}
+
+/* HEADER TICKET */
+.t-head{display:grid;grid-template-columns:1fr auto;align-items:center;padding:8px 10px 6px;border-bottom:0.5px solid #f0f0f0;}
+.t-num{font-size:1.2rem;font-weight:800;color:#1a1a1a;line-height:1;}
+.t-meta{text-align:right;}
+.t-prenom{font-size:0.82rem;font-weight:600;color:#333;}
+.t-timer{font-size:0.68rem;font-weight:700;padding:2px 6px;border-radius:4px;background:#27ae60;color:#fff;display:inline-block;margin-top:2px;}
+.t-timer.j{background:#e67e00;}
+.t-timer.r{background:#e74c3c;}
+.t-total{font-size:0.72rem;color:#999;margin-top:2px;}
+
+/* BODY TICKET */
+.t-body{padding:8px 10px;display:grid;gap:6px;}
+
+.art-row{display:grid;grid-template-columns:32px 1fr;gap:6px;align-items:start;}
+.art-img{width:32px;height:30px;object-fit:contain;border-radius:3px;}
+.art-name{font-size:0.8rem;font-weight:600;color:#1a1a1a;margin-bottom:3px;}
+.art-opts{display:flex;flex-wrap:wrap;gap:2px;}
+.opt{font-size:0.68rem;font-weight:600;padding:1px 5px;border-radius:3px;border:0.5px solid;}
+.opt-k{background:#ffe0e0;color:#990000;border-color:#ffaaaa;}
+.opt-m{background:#fffbe0;color:#775500;border-color:#ffe066;}
+.opt-mo{background:#fff3cc;color:#664400;border-color:#ffd966;}
+.opt-c{background:#e0f5e0;color:#1a5c00;border-color:#99dd88;}
+.opt-o{background:#f0e0ff;color:#550099;border-color:#cc88ff;}
+.opt-n{background:#f5e8d0;color:#5c2a00;border-color:#cc8844;}
+.opt-s{background:#e8f0ff;color:#003399;border-color:#99aaff;}
+.opt-def{background:#f5f5f5;color:#666;border-color:#ddd;}
+.art-none{font-size:0.68rem;color:#bbb;font-style:italic;}
+
+/* FOOTER TICKET */
+.t-foot{display:grid;grid-template-columns:1fr 1fr 1fr;border-top:0.5px solid #f0f0f0;}
+.t-btn{padding:7px 2px;font-size:0.68rem;font-weight:600;text-align:center;cursor:pointer;border:none;background:transparent;color:#aaa;letter-spacing:0.2px;transition:all 0.15s;}
+.t-btn:not(:last-child){border-right:0.5px solid #f0f0f0;}
+.t-btn.att{color:#e67e00;}.t-btn.att.on{background:#fff3e0;}
+.t-btn.enc{color:#2980b9;}.t-btn.enc.on{background:#e8f4fd;}
+.t-btn.pre{color:#27ae60;}.t-btn.pre.on{background:#eafaf1;}
+
+/* SECTION REMIS */
+.remis-titre{font-size:0.65rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#bbb;padding:8px 8px 4px;}
+.remis-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;padding:0 8px 40px;}
+@media(min-width:600px){.remis-grid{grid-template-columns:repeat(3,minmax(0,1fr));}}
+@media(min-width:900px){.remis-grid{grid-template-columns:repeat(4,minmax(0,1fr));}}
+.ticket-mini{background:#fff;border-radius:8px;border:0.5px solid #e0e0e0;border-left:3px solid #27ae60;padding:7px 10px;opacity:0.5;}
+.mini-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;}
+.mini-num{font-size:0.9rem;font-weight:800;color:#27ae60;}
+.mini-prenom{font-size:0.75rem;color:#666;}
+.mini-total{font-size:0.75rem;font-weight:700;color:#333;}
+.mini-arts{font-size:0.65rem;color:#bbb;}
+.mini-reprendre{background:none;border:0.5px solid #ddd;color:#999;font-size:0.65rem;border-radius:4px;padding:2px 6px;cursor:pointer;margin-top:4px;}
+
+/* REFRESH BAR */
+.refresh-bar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e0e0e0;padding:5px 10px;display:flex;align-items:center;justify-content:space-between;font-size:0.62rem;color:#aaa;}
+.dot{width:6px;height:6px;border-radius:50%;background:#27ae60;display:inline-block;margin-right:4px;}
+.dot.loading{background:#e67e00;animation:blink 0.5s infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0.2;}}
+
+.empty{grid-column:1/-1;text-align:center;padding:30px 20px;color:#bbb;font-style:italic;font-size:0.85rem;}
+</style>
+</head>
+<body>
+
+<div id="pin-screen" class="pin-screen">
+  <div class="pin-title">CUISINE</div>
+  <div class="pin-sub">Halloween Party — 31 Octobre</div>
+  <div class="pin-dots">
+    <div class="pin-dot" id="d0"></div><div class="pin-dot" id="d1"></div>
+    <div class="pin-dot" id="d2"></div><div class="pin-dot" id="d3"></div>
+  </div>
+  <div class="pin-pad">
+    <div class="pin-btn" onclick="pp('1')">1</div><div class="pin-btn" onclick="pp('2')">2</div><div class="pin-btn" onclick="pp('3')">3</div>
+    <div class="pin-btn" onclick="pp('4')">4</div><div class="pin-btn" onclick="pp('5')">5</div><div class="pin-btn" onclick="pp('6')">6</div>
+    <div class="pin-btn" onclick="pp('7')">7</div><div class="pin-btn" onclick="pp('8')">8</div><div class="pin-btn" onclick="pp('9')">9</div>
+    <div class="pin-btn" onclick="pc()" style="color:#e74c3c;">✕</div>
+    <div class="pin-btn" onclick="pp('0')">0</div>
+    <div class="pin-btn" onclick="pd()">⌫</div>
+  </div>
+  <div class="pin-err" id="pin-err"></div>
+</div>
+
+<div id="dashboard" style="display:none;">
+  <div class="header">
+    <div class="header-left">
+      <div class="header-title">Dashboard Cuisine</div>
+      <div class="header-sub" id="refresh-info">Chargement...</div>
+    </div>
+    <div class="header-right">
+      <button class="btn-refresh" onclick="charger()">Actualiser</button>
+      <button class="btn-lock" onclick="lock()">Verrouiller</button>
+    </div>
+  </div>
+
+  <div class="compteurs">
+    <div class="cpt total"><div class="cpt-num" id="ct">0</div><div class="cpt-label">Total</div></div>
+    <div class="cpt att"><div class="cpt-num" id="ca">0</div><div class="cpt-label">Attente</div></div>
+    <div class="cpt enc"><div class="cpt-num" id="ce">0</div><div class="cpt-label">Prep.</div></div>
+    <div class="cpt pre"><div class="cpt-num" id="cp">0</div><div class="cpt-label">Pret</div></div>
+  </div>
+
+  <div class="kds-grid" id="kds-grid"></div>
+
+  <div class="remis-titre" id="remis-titre" style="display:none;">Commandes remises</div>
+  <div class="remis-grid" id="remis-grid"></div>
+</div>
+
+<div class="refresh-bar">
+  <span><span class="dot" id="dot"></span>Refresh 15s</span>
+  <span id="refresh-time"></span>
+</div>
+
+<script>
+var URL='https://script.google.com/macros/s/AKfycbxTXZ7CQYpu_mYPUUdxc0zfdDaoGGmVQl7B7BtXZrj8dGe3kSPUPZvbs_UItIduSfjc/exec';
+var PIN='3110';
+var pin='';
+var cmds={};
+var ri;
+var IMGS={menu:'https://bouisbouis2-design.github.io/halloween-party/menu.png',hotdog:'https://bouisbouis2-design.github.io/halloween-party/hotdog.png',frites:'https://bouisbouis2-design.github.io/halloween-party/frites.png',crepe:'https://bouisbouis2-design.github.io/halloween-party/crepe.png'};
+
+function pp(n){if(pin.length>=4)return;pin+=n;dots();if(pin.length===4)setTimeout(check,200);}
+function pd(){pin=pin.slice(0,-1);dots();}
+function pc(){pin='';dots();}
+function dots(){for(var i=0;i<4;i++)document.getElementById('d'+i).classList.toggle('filled',i<pin.length);}
+function check(){
+  if(pin===PIN){
+    document.getElementById('pin-screen').style.display='none';
+    document.getElementById('dashboard').style.display='block';
+    charger();ri=setInterval(charger,15000);
+  }else{
+    document.getElementById('pin-err').textContent='Code incorrect';
+    pin='';dots();setTimeout(function(){document.getElementById('pin-err').textContent='';},2000);
+  }
+}
+function lock(){clearInterval(ri);pin='';dots();document.getElementById('pin-screen').style.display='flex';document.getElementById('dashboard').style.display='none';}
+
+async function charger(){
+  var dot=document.getElementById('dot');dot.classList.add('loading');
+  try{
+    var r=await fetch(URL+'?action=read');
+    var d=await r.json();
+    if(d.status==='ok'){
+      d.rows.forEach(function(row){
+        var num=row[2];if(!num)return;
+        var s=row[6]||'attente';
+        if(!cmds[num]){var rawDate=row[0];var parsedDate=new Date(rawDate);if(isNaN(parsedDate.getTime())){var parts=String(rawDate).replace('T',' ').split(/[\s\/\-:]/);parsedDate=new Date(parts[0],parts[1]-1,parts[2],parts[3]||0,parts[4]||0,parts[5]||0);}cmds[num]={num:num,prenom:row[1],articles:row[3],total:row[5],heure:parsedDate,statut:s,lc:false};}
+        else if(!cmds[num].lc){cmds[num].statut=s;}
+      });
+      render();
+      var now=new Date();
+      var t=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
+      document.getElementById('refresh-info').textContent='Mis a jour a '+t;
+      document.getElementById('refresh-time').textContent=t+':'+now.getSeconds().toString().padStart(2,'0');
+    }
+  }catch(e){document.getElementById('refresh-info').textContent='Erreur connexion';}
+  dot.classList.remove('loading');
+}
+
+function render(){
+  var list=Object.values(cmds);
+  var att=list.filter(function(c){return c.statut==='attente';}).length;
+  var enc=list.filter(function(c){return c.statut==='encours';}).length;
+  var pre=list.filter(function(c){return c.statut==='pret';}).length;
+  var actif=list.filter(function(c){return c.statut!=='remis';}).length;
+  document.getElementById('ct').textContent=actif;
+  document.getElementById('ca').textContent=att;
+  document.getElementById('ce').textContent=enc;
+  document.getElementById('cp').textContent=pre;
+
+  var actives=list.filter(function(c){return c.statut!=='remis'&&c.statut!=='pret';});
+  actives.sort(function(a,b){var o={attente:0,encours:1,pret:2};return o[a.statut]-o[b.statut]||a.heure-b.heure;});
+  var grid=document.getElementById('kds-grid');
+  grid.innerHTML='';
+  if(!actives.length){grid.innerHTML='<div class="empty">Aucune commande en cours</div>';}
+  else{actives.forEach(function(c){grid.appendChild(makeTicket(c));});}
+
+  var remis=list.filter(function(c){return c.statut==='pret'||c.statut==='remis';});
+  var rt=document.getElementById('remis-titre');
+  var rg=document.getElementById('remis-grid');
+  rg.innerHTML='';
+  if(!remis.length){rt.style.display='none';}
+  else{
+    rt.style.display='block';rt.textContent=remis.filter(function(c){return c.statut==='pret';}).length>0?'Commandes pretes — en attente de remise':'Commandes remises';
+    remis.sort(function(a,b){return b.heure-a.heure;});
+    remis.forEach(function(c){rg.appendChild(makeMini(c));});
+  }
+}
+
+function makeTicket(c){
+  var now=new Date();
+  var diff=Math.floor((now.getTime()-c.heure.getTime())/1000);
+  if(diff<0)diff=0;
+  var min=Math.floor(diff/60);var sec=diff%60;
+  var tstr=min>90?'—':min+'m'+sec.toString().padStart(2,'0')+'s';
+  var tcls=min>=9&&min<=90?'r':min>=6&&min<=90?'j':'';
+  var urgent=min>=9&&min<=90&&c.statut!=='pret';
+
+  var div=document.createElement('div');
+  div.className='ticket'+(c.statut==='encours'?' enc':c.statut==='pret'?' pre':'')+(urgent?' urgent':'');
+  div.innerHTML=
+    '<div class="t-head">'+
+      '<div class="t-num">N°'+c.num+'</div>'+
+      '<div class="t-meta">'+
+        '<div class="t-prenom">'+c.prenom+'</div>'+
+        '<div class="t-timer '+tcls+'">'+tstr+'</div>'+
+        '<div class="t-total">'+c.total+' €</div>'+
+      '</div>'+
+    '</div>'+
+    '<div class="t-body">'+parseArts(c.articles)+'</div>'+
+    '<div class="t-foot">'+
+      '<button class="t-btn att'+(c.statut==='attente'?' on':'')+'" onclick="setS(\''+c.num+'\',\'attente\')">Attente</button>'+
+      '<button class="t-btn enc'+(c.statut==='encours'?' on':'')+'" onclick="setS(\''+c.num+'\',\'encours\')">En prep.</button>'+
+      '<button class="t-btn pre'+(c.statut==='pret'?' on':'')+'" onclick="setS(\''+c.num+'\',\'pret\')">Pret !</button>'+
+    '</div>';
+  return div;
+}
+
+function makeMini(c){
+  var parts=c.articles?c.articles.split(' | '):[];
+  var noms=parts.map(function(p){return p.split(' - ')[0];}).join(', ');
+  var div=document.createElement('div');
+  div.className='ticket-mini';
+  div.innerHTML=
+    '<div class="mini-head">'+
+      '<span class="mini-num">N°'+c.num+'</span>'+
+      '<span class="mini-total">'+c.total+' €</span>'+
+    '</div>'+
+    '<div class="mini-prenom">'+c.prenom+'</div>'+
+    '<div class="mini-arts">'+noms+'</div>'+
+    '<button class="mini-reprendre" onclick="setS(\''+c.num+'\',\'encours\')">Reprendre</button>';
+  return div;
+}
+
+function parseArts(str){
+  if(!str)return '<div class="art-none">Aucun detail</div>';
+  var parts=str.split(' | ');
+  var html='';
+  parts.forEach(function(part){
+    var d=part.indexOf(' - ');
+    var name=d>=0?part.substring(0,d).trim():part.trim();
+    var opts=d>=0?part.substring(d+3).trim():'';
+    var nl=name.toLowerCase();
+    var img='';
+    if(nl.indexOf('menu')>=0)img=IMGS.menu;
+    else if(nl.indexOf('hot')>=0)img=IMGS.hotdog;
+    else if(nl.indexOf('frite')>=0)img=IMGS.frites;
+    else if(nl.indexOf('crep')>=0)img=IMGS.crepe;
+    html+='<div class="art-row">';
+    html+='<img class="art-img" src="'+img+'" alt=""/>';
+    html+='<div><div class="art-name">'+name+'</div>';
+    if(opts){
+      var ol=opts.split(', ');
+      html+='<div class="art-opts">';
+      ol.forEach(function(o){
+        o=o.trim().replace(/[✓]/g,'').trim();
+        var c='opt-def';var lo=o.toLowerCase();
+        if(lo==='ketchup')c='opt-k';
+        else if(lo==='mayo')c='opt-m';
+        else if(lo==='moutarde')c='opt-mo';
+        else if(lo==='cornichons')c='opt-c';
+        else if(lo.indexOf('oignon')>=0)c='opt-o';
+        else if(lo==='nutella')c='opt-n';
+        else if(lo==='sucre')c='opt-s';
+        html+='<span class="opt '+c+'">'+o+'</span>';
+      });
+      html+='</div>';
+    }else{html+='<div class="art-none">Sans option</div>';}
+    html+='</div></div>';
+  });
+  return html;
+}
+
+function setS(num,statut){
+  if(!cmds[num])return;
+  cmds[num].statut=statut;cmds[num].lc=true;
+  render();
+  fetch(URL+'?action=statut&numero='+encodeURIComponent(num)+'&statut='+encodeURIComponent(statut))
+    .then(function(r){return r.json();})
+    .then(function(){setTimeout(function(){if(cmds[num])cmds[num].lc=false;},5000);})
+    .catch(function(){});
+}
+
+setInterval(function(){if(document.getElementById('dashboard').style.display!=='none')render();},10000);
+</script>
+</body>
+</html>
